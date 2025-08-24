@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1074199428257",
+    "project_id": "charusat-maps-1c7ee",
+    "storage_bucket": "charusat-maps-1c7ee.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1074199428257:android:01112a219d1240ee3b84e0",
+        "android_client_info": {
+          "package_name": "com.example.charusat_maps"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUXqUHFU2Lf1b0bwWULsD0PhOTQDwytSA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

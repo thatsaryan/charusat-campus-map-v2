@@ -1,16 +1,15 @@
 // ignore_for_file: unused_local_variable
-
 import 'package:charusat_maps/campus_map.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'services/auth_service.dart';
-import 'Login_Screen.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'academic_buildings.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
-  // Minimal modern color scheme
   static const Color primary = Color(0xFF497DD1);
   static const Color secondary = Color(0xFF6C7293);
   static const Color accent = Color(0xFF007AFF);
@@ -21,63 +20,34 @@ class HomeScreen extends StatelessWidget {
   static const Color border = Color(0xFFE5E7EB);
 
   @override
-  Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-    final authService = AuthService();
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  MobileScannerController? cameraController;
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: surface,
+      backgroundColor: HomeScreen.surface,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            // Fixed Modern App Bar
-            SliverAppBar(
-              expandedHeight: 120,
-              floating: false,
-              pinned: true, // Keeps it fixed
-              snap: false,
-              automaticallyImplyLeading: false,
-              elevation: 0,
-              backgroundColor: surface,
-              foregroundColor: textPrimary,
-              flexibleSpace: FlexibleSpaceBar(
-                collapseMode: CollapseMode.none, // Prevent collapse animation
-                title: const Text(
+            // Replace the entire SliverAppBar section with this:
+            SliverToBoxAdapter(
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
+                color: HomeScreen.surface,
+                child: const Text(
                   'Campus',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 32,
                     fontWeight: FontWeight.w600,
-                    color: textPrimary,
+                    color: HomeScreen.textPrimary,
                   ),
                 ),
-                titlePadding: const EdgeInsets.only(left: 24, bottom: 16),
               ),
-              actions: [
-                Container(
-                  margin: const EdgeInsets.only(right: 16),
-                  child: IconButton(
-                    onPressed: () async {
-                      await _showLogoutDialog(context, authService);
-                    },
-                    icon: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: cardSurface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: border),
-                      ),
-                      child: const Icon(
-                        Icons.person_outline,
-                        size: 20,
-                        color: textPrimary,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
             ),
-
-            // Page Content
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -86,19 +56,17 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     const SizedBox(height: 8),
 
-                    // Subtitle
                     Text(
                       'Navigate your campus with ease',
                       style: TextStyle(
                         fontSize: 16,
-                        color: textSecondary,
+                        color: HomeScreen.textSecondary,
                         height: 1.5,
                       ),
                     ),
 
                     const SizedBox(height: 40),
 
-                    // Main Action Card
                     _buildMainActionCard(
                       context,
                       icon: Icons.map_outlined,
@@ -117,13 +85,12 @@ class HomeScreen extends StatelessWidget {
 
                     const SizedBox(height: 32),
 
-                    // Section Header
                     const Text(
                       'Quick Access',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
-                        color: textPrimary,
+                        color: HomeScreen.textPrimary,
                       ),
                     ),
 
@@ -159,11 +126,11 @@ class HomeScreen extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: primary,
+          color: HomeScreen.primary,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: primary.withOpacity(0.1),
+              color: HomeScreen.primary.withOpacity(0.1),
               spreadRadius: 0,
               blurRadius: 20,
               offset: const Offset(0, 8),
@@ -237,19 +204,19 @@ class HomeScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: cardSurface,
+          color: HomeScreen.cardSurface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: border),
+          border: Border.all(color: HomeScreen.border),
         ),
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: accent.withOpacity(0.1),
+                color: HomeScreen.accent.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, size: 24, color: accent),
+              child: Icon(icon, size: 24, color: HomeScreen.accent),
             ),
             const SizedBox(height: 12),
             Text(
@@ -257,7 +224,7 @@ class HomeScreen extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
-                color: textPrimary,
+                color: HomeScreen.textPrimary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -269,6 +236,12 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildServicesList(BuildContext context) {
     final services = [
+      {
+        'icon': Icons.camera_alt_outlined,
+        'title': 'Scanner',
+        'subtitle': 'Scan the QR code to get details',
+        'onTap': () => _showFeatureSnackBar(context, 'QR Code Scanner'),
+      },
       {
         'icon': Icons.school_outlined,
         'title': 'Academic Buildings',
@@ -328,19 +301,19 @@ class HomeScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: cardSurface,
+          color: HomeScreen.cardSurface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: border),
+          border: Border.all(color: HomeScreen.border),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: surface,
+                color: HomeScreen.surface,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon, size: 22, color: textPrimary),
+              child: Icon(icon, size: 22, color: HomeScreen.textPrimary),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -352,7 +325,7 @@ class HomeScreen extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: textPrimary,
+                      color: HomeScreen.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -360,86 +333,419 @@ class HomeScreen extends StatelessWidget {
                     subtitle,
                     style: TextStyle(
                       fontSize: 14,
-                      color: textSecondary,
+                      color: HomeScreen.textSecondary,
                       height: 1.3,
                     ),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, size: 20, color: textSecondary),
+            Icon(
+              Icons.chevron_right,
+              size: 20,
+              color: HomeScreen.textSecondary,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Future<void> _showLogoutDialog(
-    BuildContext context,
-    AuthService authService,
-  ) async {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: cardSurface,
+  void _showFeatureSnackBar(BuildContext context, String feature) {
+    // Check if the feature is QR Code Scanner
+    if (feature == "QR Code Scanner") {
+      // Check if the platform is supported for QR scanning
+      if (kIsWeb ||
+          Platform.isWindows ||
+          Platform.isLinux ||
+          Platform.isMacOS) {
+        _showUnsupportedPlatformMessage(context);
+      } else {
+        // Show QR scanner dialog on supported platforms
+        _showQRScannerDialog(context);
+      }
+    } else {
+      // For other features, show a "coming soon" message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '$feature coming soon!',
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+          ),
+          backgroundColor: HomeScreen.primary,
+          behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
           ),
-          title: const Text(
-            'Sign Out',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: textPrimary,
-            ),
-          ),
-          content: const Text(
-            'Are you sure you want to sign out?',
-            style: TextStyle(fontSize: 16, color: textSecondary),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  color: textSecondary,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.of(context).pop();
-                await authService.signOut();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AuthScreen()),
-                );
-              },
-              child: const Text(
-                'Sign Out',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+          margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  void _showUnsupportedPlatformMessage(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          'QR scanning is not available on this platform',
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+        ),
+        backgroundColor: Colors.red.shade700,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+      ),
     );
   }
 
-  void _showFeatureSnackBar(BuildContext context, String feature) {
+  void _showQRScannerDialog(BuildContext context) async {
+    // Check camera permission first
+    final status = await Permission.camera.request();
+    if (status.isDenied) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            'Camera permission is required for QR scanning',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+          ),
+          backgroundColor: Colors.red.shade700,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
+    // Navigate to full-screen QR scanner instead of showing dialog
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const QRScannerScreen()),
+    );
+  }
+
+  void _onNavigate(BuildContext context, String source, String institute) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          '$feature coming soon',
+          'Navigating to $source in $institute',
           style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
         ),
-        backgroundColor: textPrimary,
+        backgroundColor: HomeScreen.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+}
+
+// Separate QR Scanner Screen to avoid LayoutBuilder conflicts
+class QRScannerScreen extends StatefulWidget {
+  const QRScannerScreen({Key? key}) : super(key: key);
+
+  @override
+  State<QRScannerScreen> createState() => _QRScannerScreenState();
+}
+
+class _QRScannerScreenState extends State<QRScannerScreen> {
+  MobileScannerController? cameraController = MobileScannerController();
+  String qrCodeResult = "";
+  bool hasScanned = false;
+
+  // List of Charusat University institutes
+  List<String> institutes = [
+    'CSPIT',
+    'DEPSTAR',
+    'CMPICA',
+    'IIIM',
+    'RPCP',
+    'PDPIAS',
+    'MTIN',
+    'CIPS',
+    'Architecture',
+  ];
+
+  String selectedInstitute = 'CSPIT';
+  final TextEditingController sourceController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    sourceController.text = "Scan a QR code";
+  }
+
+  @override
+  void dispose() {
+    try {
+      cameraController?.dispose();
+    } catch (e) {
+      print("Error disposing camera: $e");
+    }
+    sourceController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('QR Code Scanner'),
+        backgroundColor: HomeScreen.primary,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      backgroundColor: Colors.black,
+      body: Column(
+        children: [
+          // QR Scanner view - Always show camera when not scanned
+          if (!hasScanned)
+            Expanded(
+              child: Stack(
+                children: [
+                  MobileScanner(
+                    controller: cameraController,
+                    onDetect: (capture) {
+                      if (!hasScanned && capture.barcodes.isNotEmpty) {
+                        final barcode = capture.barcodes.first;
+                        setState(() {
+                          qrCodeResult = barcode.rawValue ?? '';
+                          hasScanned = true;
+                          sourceController.text = qrCodeResult;
+                        });
+
+                        // Stop camera after successful scan
+                        try {
+                          cameraController?.stop();
+                        } catch (e) {
+                          print("Error stopping camera: $e");
+                        }
+                      }
+                    },
+                  ),
+                  // Scanning overlay
+                  Center(
+                    child: Container(
+                      width: 250,
+                      height: 250,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white, width: 2),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ),
+                  // Instructions
+                  const Positioned(
+                    bottom: 60,
+                    left: 0,
+                    right: 0,
+                    child: Text(
+                      "Align QR code within frame",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          // Form section - Only show when QR is scanned
+          else
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                color: Colors.white,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Success message
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        margin: const EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.green.shade200),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.check_circle,
+                              color: Colors.green.shade600,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'QR Code scanned successfully!',
+                                style: TextStyle(
+                                  color: Colors.green.shade700,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const Text(
+                        'Source',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: HomeScreen.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: sourceController,
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: HomeScreen.surface,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.refresh),
+                            onPressed: () {
+                              setState(() {
+                                hasScanned = false;
+                                qrCodeResult = "";
+                                sourceController.text = "Scan a QR code";
+                              });
+                              try {
+                                cameraController = MobileScannerController();
+                              } catch (e) {
+                                print("Camera restart error: $e");
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Select Institute',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: HomeScreen.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<String>(
+                        value: selectedInstitute,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: HomeScreen.surface,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                        ),
+                        items: institutes.map((String institute) {
+                          return DropdownMenuItem<String>(
+                            value: institute,
+                            child: Text(institute),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          if (newValue != null) {
+                            setState(() {
+                              selectedInstitute = newValue;
+                            });
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 30),
+                      // Action Buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                              ),
+                              child: const Text(
+                                'Cancel',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: HomeScreen.textSecondary,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: _onNavigate,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: HomeScreen.primary,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                              ),
+                              child: const Text(
+                                'Navigate',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _onNavigate() {
+    try {
+      cameraController?.stop();
+    } catch (e) {
+      print("Error stopping camera: $e");
+    }
+
+    Navigator.of(context).pop();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Navigating to $qrCodeResult in $selectedInstitute',
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+        ),
+        backgroundColor: HomeScreen.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),

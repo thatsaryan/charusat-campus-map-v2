@@ -1,17 +1,7 @@
 import 'package:flutter/material.dart';
-import 'auth_wrapper.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'home_screen.dart';
 
-import 'firebase_options.dart';
-
-void main() async {
-  // Make sure Flutter is initialized before Firebase
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  // Run the app
+void main() {
   runApp(
     const MaterialApp(debugShowCheckedModeBanner: false, home: SplashScreen()),
   );
@@ -40,12 +30,10 @@ class _SplashScreenState extends State<SplashScreen>
 
     _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
 
-    // Delay before navigating to auth wrapper
     Future.delayed(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
-        // ignore: use_build_context_synchronously
         context,
-        MaterialPageRoute(builder: (context) => const AuthWrapper()),
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     });
   }

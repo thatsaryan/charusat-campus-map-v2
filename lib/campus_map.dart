@@ -150,6 +150,7 @@ class _PanoramaScreenState extends State<PanoramaScreen> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     final currentScene = panoramaData[_currentSceneId];

@@ -5,6 +5,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'navigation_display_screen.dart';
+import 'route_manager.dart';
 
 class QRScannerScreen extends StatefulWidget {
   const QRScannerScreen({Key? key}) : super(key: key);
@@ -153,7 +154,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       backgroundColor: Colors.black,
       body: Column(
         children: [
-          // QR Scanner view - Always show camera when not scanned
           if (!hasScanned) _buildScannerView() else _buildResultForm(),
         ],
       ),
@@ -164,7 +164,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
     return Expanded(
       child: Stack(
         children: [
-          // Show loading animation while camera is initializing
           if (isCameraInitializing)
             Container(
               color: Colors.black,
@@ -200,7 +199,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                     hasScanned = true;
                     sourceController.text = qrCodeResult;
                   });
-                  // Stop camera after successful scan
                   try {
                     cameraController?.stop();
                   } catch (e) {
@@ -210,7 +208,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
               },
             ),
 
-          // Scanning overlay (only show when camera is ready)
           if (!isCameraInitializing)
             Center(
               child: Container(
@@ -223,7 +220,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
               ),
             ),
 
-          // Instructions (only show when camera is ready)
           if (!isCameraInitializing)
             const Positioned(
               bottom: 60,
@@ -389,7 +385,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
               ),
               child: Column(
                 children: [
-                  // Handle bar
                   Container(
                     margin: const EdgeInsets.only(top: 12),
                     width: 40,
@@ -399,7 +394,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  // Header
                   Padding(
                     padding: const EdgeInsets.all(20),
                     child: Row(
@@ -424,7 +418,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                       ],
                     ),
                   ),
-                  // 2-Column Grid
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -561,7 +554,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
     }
   }
 
-  /// Updated navigation method to handle A6 to A7 route
+  /// Updated navigation method with debug logging
   void _onNavigate() async {
     setState(() {
       isLoading = true;
@@ -573,70 +566,60 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       print("Error stopping camera: $e");
     }
 
-    // Simulate processing delay
     await Future.delayed(const Duration(milliseconds: 1000));
 
     setState(() {
       isLoading = false;
     });
 
-    // Check if this is the A6 to A7 route
-    if (_shouldShowNavigationScreen()) {
-      Navigator.of(context).pop(); // Close QR scanner
-      // Navigate to NavigationDisplayScreen with your 3 images
+    // Debug logging
+    print("=== DEBUG INFO ===");
+    print("QR Code Result: '$qrCodeResult'");
+    print("Selected Institute: '$selectedInstitute'");
+
+    final routeKey = RouteManager.generateRouteKey(
+      qrCodeResult,
+      selectedInstitute,
+    );
+    print("Generated Route Key: '$routeKey'");
+    print("Available Routes: ${RouteManager.getAllRoutes()}");
+
+    final routeImages = RouteManager.getRouteImages(
+      qrCodeResult,
+      selectedInstitute,
+    );
+    print("Route Images: $routeImages");
+    print("==================");
+
+    if (routeImages != null && routeImages.isNotEmpty) {
+      Navigator.of(context).pop();
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => NavigationDisplayScreen(
             source: qrCodeResult,
             destination: selectedInstitute,
-            imageUrls: [
-              'https://raw.githubusercontent.com/thatsaryan/Campus_View/a02da1cf91050fa5c3aa4cb8c3875badb19da20a/A6-A7(1).png',
-              'https://raw.githubusercontent.com/thatsaryan/Campus_View/a02da1cf91050fa5c3aa4cb8c3875badb19da20a/A6-A7(2).png',
-              'https://raw.githubusercontent.com/thatsaryan/Campus_View/a02da1cf91050fa5c3aa4cb8c3875badb19da20a/A6-A7(3).png',
-            ],
+            imageUrls: routeImages,
           ),
         ),
       );
     } else {
-      // For other routes, show regular snackbar
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Navigating to $qrCodeResult in $selectedInstitute',
+            'Route from $qrCodeResult to $selectedInstitute is not available yet.\nLooking for: $routeKey',
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
           ),
-          backgroundColor: primary,
+          backgroundColor: Colors.orange.shade700,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 2),
+          duration: const Duration(seconds: 4),
         ),
       );
     }
-  }
-
-  /// Check if we should show the NavigationDisplayScreen
-  bool _shouldShowNavigationScreen() {
-    // Normalize the strings for comparison
-    final source = qrCodeResult.toLowerCase().trim();
-    final destination = selectedInstitute.toLowerCase().trim();
-
-    // Check for A6 to A7 route (various possible combinations)
-    final isA6ToA7 =
-        (source.contains('a6') && destination.contains('a7')) ||
-        (source.contains('cspit-a6') && destination.contains('cspit-a7')) ||
-        (source.contains('cspit a6') && destination.contains('cspit a7'));
-
-    // Check for A7 to A6 route (reverse direction - same images)
-    final isA7ToA6 =
-        (source.contains('a7') && destination.contains('a6')) ||
-        (source.contains('cspit-a7') && destination.contains('cspit-a6')) ||
-        (source.contains('cspit a7') && destination.contains('cspit a6'));
-
-    return isA6ToA7 || isA7ToA6;
   }
 }

@@ -1,6 +1,7 @@
 // ignore_for_file: unused_field
 
 import 'package:flutter/material.dart';
+import 'route_manager.dart';
 
 class NavigationDisplayScreen extends StatefulWidget {
   final String source;
@@ -42,7 +43,7 @@ class _NavigationDisplayScreenState extends State<NavigationDisplayScreen> {
   @override
   void initState() {
     super.initState();
-    _imageUrls = widget.imageUrls ?? _getImageUrlsForRoute();
+    _imageUrls = widget.imageUrls ?? [];
   }
 
   @override
@@ -85,8 +86,15 @@ class _NavigationDisplayScreenState extends State<NavigationDisplayScreen> {
     );
   }
 
-  /// Build compact route information (reduced size)
+  /// Build compact route information (with distance)
   Widget _buildCompactRouteInfo() {
+    // Get current route distance
+    final distance = RouteManager.getRouteDistance(
+      widget.source,
+      widget.destination,
+      _currentImageIndex,
+    );
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.fromLTRB(20, 16, 20, 8),
@@ -104,111 +112,156 @@ class _NavigationDisplayScreenState extends State<NavigationDisplayScreen> {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         children: [
-          // From section
-          Expanded(
-            child: Row(
-              children: [
+          // Route info row
+          Row(
+            children: [
+              // From section
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(
+                        Icons.location_on,
+                        color: Colors.green,
+                        size: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'From',
+                            style: TextStyle(
+                              color: textSecondary,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          Text(
+                            widget.source,
+                            style: const TextStyle(
+                              color: textPrimary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(width: 16),
+
+              // To section
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(
+                        Icons.flag,
+                        color: Colors.red,
+                        size: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'To',
+                            style: TextStyle(
+                              color: textSecondary,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          Text(
+                            widget.destination,
+                            style: const TextStyle(
+                              color: textPrimary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Path count indicator
+              if (_imageUrls.length > 1)
                 Container(
-                  padding: const EdgeInsets.all(6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(6),
+                    color: accent.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(Icons.location_on, color: Colors.green, size: 16),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'From',
-                        style: TextStyle(
-                          color: textSecondary,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      Text(
-                        widget.source,
-                        style: const TextStyle(
-                          color: textPrimary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                  child: Text(
+                    '${_imageUrls.length} paths',
+                    style: TextStyle(
+                      color: accent,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
-              ],
-            ),
+            ],
           ),
 
-          const SizedBox(width: 16),
-
-          // To section
-          Expanded(
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Icon(Icons.flag, color: Colors.red, size: 16),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'To',
-                        style: TextStyle(
-                          color: textSecondary,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      Text(
-                        widget.destination,
-                        style: const TextStyle(
-                          color: textPrimary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Path count indicator
-          if (_imageUrls.length > 1)
+          // Distance info
+          if (distance != null) ...[
+            const SizedBox(height: 12),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: accent.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
+                color: primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: primary.withOpacity(0.2)),
               ),
-              child: Text(
-                '${_imageUrls.length} paths',
-                style: TextStyle(
-                  color: accent,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.straighten, color: primary, size: 16),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${_getPathName(_currentImageIndex)}: ${distance}m',
+                    style: TextStyle(
+                      color: primary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ),
+          ],
         ],
       ),
     );
@@ -266,7 +319,7 @@ class _NavigationDisplayScreenState extends State<NavigationDisplayScreen> {
               if (_imageUrls.length > 1)
                 Positioned(top: 16, right: 16, child: _buildPageIndicator()),
 
-              // Path label
+              // Path label with distance
               if (_imageUrls.length > 1)
                 Positioned(top: 16, left: 16, child: _buildPathLabel()),
 
@@ -310,7 +363,7 @@ class _NavigationDisplayScreenState extends State<NavigationDisplayScreen> {
               });
             }
           },
-          child: Container(
+          child: SizedBox(
             width: double.infinity,
             height: double.infinity,
             child: Image.network(
@@ -321,6 +374,7 @@ class _NavigationDisplayScreenState extends State<NavigationDisplayScreen> {
                 return _buildLoadingIndicator();
               },
               errorBuilder: (context, error, stackTrace) {
+                print("Error loading image: $error");
                 return _buildErrorPlaceholder(index);
               },
             ),
@@ -389,8 +443,14 @@ class _NavigationDisplayScreenState extends State<NavigationDisplayScreen> {
     );
   }
 
-  /// Build path label
+  /// Build path label with distance
   Widget _buildPathLabel() {
+    final distance = RouteManager.getRouteDistance(
+      widget.source,
+      widget.destination,
+      _currentImageIndex,
+    );
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -398,7 +458,9 @@ class _NavigationDisplayScreenState extends State<NavigationDisplayScreen> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
-        'Path ${_currentImageIndex + 1}',
+        distance != null
+            ? '${_getPathName(_currentImageIndex)} • ${distance}m'
+            : _getPathName(_currentImageIndex),
         style: const TextStyle(
           color: Colors.white,
           fontSize: 11,
@@ -454,7 +516,7 @@ class _NavigationDisplayScreenState extends State<NavigationDisplayScreen> {
     );
   }
 
-  /// Build path selector buttons
+  /// Build path selector buttons with distances
   Widget _buildPathSelector() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -465,6 +527,12 @@ class _NavigationDisplayScreenState extends State<NavigationDisplayScreen> {
             child: Row(
               children: List.generate(_imageUrls.length, (index) {
                 final isSelected = _currentImageIndex == index;
+                final distance = RouteManager.getRouteDistance(
+                  widget.source,
+                  widget.destination,
+                  index,
+                );
+
                 return GestureDetector(
                   onTap: () {
                     // Reset zoom before changing paths
@@ -483,7 +551,7 @@ class _NavigationDisplayScreenState extends State<NavigationDisplayScreen> {
                     margin: const EdgeInsets.symmetric(horizontal: 4),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
-                      vertical: 6,
+                      vertical: 8,
                     ),
                     decoration: BoxDecoration(
                       color: isSelected ? primary : cardSurface,
@@ -493,13 +561,31 @@ class _NavigationDisplayScreenState extends State<NavigationDisplayScreen> {
                       ),
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Text(
-                      _getPathName(index),
-                      style: TextStyle(
-                        color: isSelected ? Colors.white : textPrimary,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          _getPathName(index),
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : textPrimary,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        if (distance != null) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            '${distance}m',
+                            style: TextStyle(
+                              color: isSelected
+                                  ? Colors.white.withOpacity(0.8)
+                                  : textSecondary,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 );
@@ -513,29 +599,12 @@ class _NavigationDisplayScreenState extends State<NavigationDisplayScreen> {
 
   /// Get path name for display
   String _getPathName(int index) {
-    final pathNames = ['Accessible', 'Shortest', 'By vehicle'];
+    final pathNames = ['By Vehicle', 'Shortest', 'Accessible'];
 
     if (index < pathNames.length) {
       return pathNames[index];
     }
     return 'Path ${index + 1}';
-  }
-
-  /// Get specific image URLs based on route
-  List<String> _getImageUrlsForRoute() {
-    final route = '${widget.source}_to_${widget.destination}'
-        .toLowerCase()
-        .replaceAll(' ', '_');
-
-    final routeImages = {
-      'cspit_a6_to_cspit_a7': [
-        'https://raw.githubusercontent.com/thatsaryan/Campus_View/a02da1cf91050fa5c3aa4cb8c3875badb19da20a/A6-A7(1).png',
-        'https://raw.githubusercontent.com/thatsaryan/Campus_View/a02da1cf91050fa5c3aa4cb8c3875badb19da20a/A6-A7(2).png',
-        'https://raw.githubusercontent.com/thatsaryan/Campus_View/a02da1cf91050fa5c3aa4cb8c3875badb19da20a/A6-A7(3).png',
-      ],
-    };
-
-    return routeImages[route] ?? [];
   }
 
   /// Build loading indicator
@@ -667,10 +736,16 @@ class _NavigationDisplayScreenState extends State<NavigationDisplayScreen> {
 
   /// Handle start navigation action
   void _startNavigation() {
+    final distance = RouteManager.getRouteDistance(
+      widget.source,
+      widget.destination,
+      _currentImageIndex,
+    );
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Starting navigation via ${_getPathName(_currentImageIndex)} from ${widget.source} to ${widget.destination}',
+          'Starting navigation via ${_getPathName(_currentImageIndex)}${distance != null ? ' (${distance}m)' : ''} from ${widget.source} to ${widget.destination}',
           style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
         ),
         backgroundColor: primary,

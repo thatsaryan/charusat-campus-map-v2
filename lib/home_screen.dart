@@ -1,24 +1,11 @@
 // ignore_for_file: unused_local_variable
 import 'package:charusat_maps/campus_map.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:io' show Platform;
-import 'package:permission_handler/permission_handler.dart';
 import 'academic_buildings.dart';
-import 'qr_scanner_screen.dart';
+import 'directions.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
-
-  // Color constants
-  static const Color primary = Color(0xFF497DD1);
-  static const Color secondary = Color(0xFF6C7293);
-  static const Color accent = Color(0xFF007AFF);
-  static const Color surface = Color(0xFFFAFAFA);
-  static const Color cardSurface = Colors.white;
-  static const Color textPrimary = Color(0xFF1A1A1A);
-  static const Color textSecondary = Color(0xFF6C7293);
-  static const Color border = Color(0xFFE5E7EB);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -27,334 +14,418 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: HomeScreen.surface,
-      body: SafeArea(
-        child: CustomScrollView(slivers: [_buildHeader(), _buildContent()]),
-      ),
-    );
-  }
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
 
-  /// Build the header section
-  Widget _buildHeader() {
-    return SliverToBoxAdapter(
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
-        color: HomeScreen.surface,
-        child: const Text(
-          'Campus',
-          style: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.w600,
-            color: HomeScreen.textPrimary,
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF1E3A8A),
+              Color(0xFF3B82F6),
+              Color(0xFF60A5FA),
+            ],
+            stops: [0.0, 0.6, 1.0],
+          ),
+        ),
+        child: SafeArea(
+          child: CustomScrollView(
+            slivers: [
+              _buildSliverHeader(screenHeight, screenWidth),
+              _buildSliverContent(screenHeight, screenWidth),
+            ],
           ),
         ),
       ),
     );
   }
 
-  /// Build the main content section
-  Widget _buildContent() {
+  Widget _buildSliverHeader(double screenHeight, double screenWidth) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 8),
-            _buildSubtitle(),
-            const SizedBox(height: 40),
-            _buildMainActionCard(),
-            const SizedBox(height: 32),
-            _buildQuickAccessSection(),
-            const SizedBox(height: 32),
-            _buildServicesList(),
-            const SizedBox(height: 40),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Build subtitle text
-  Widget _buildSubtitle() {
-    return Text(
-      'Navigate your campus with ease',
-      style: TextStyle(
-        fontSize: 16,
-        color: HomeScreen.textSecondary,
-        height: 1.5,
-      ),
-    );
-  }
-
-  /// Build the main action card for campus exploration
-  Widget _buildMainActionCard() {
-    return _buildActionCard(
-      icon: Icons.map_outlined,
-      title: 'Explore Campus',
-      subtitle: 'Interactive campus map with real-time navigation',
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const PanoramaScreen()),
-        );
-      },
-    );
-  }
-
-  /// Build the quick access section
-  Widget _buildQuickAccessSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Quick Access',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: HomeScreen.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 20),
-        _buildActionGrid(),
-      ],
-    );
-  }
-
-  /// Build a reusable action card widget
-  Widget _buildActionCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: HomeScreen.primary,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: HomeScreen.primary.withOpacity(0.1),
-              spreadRadius: 0,
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
+        padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.06, // Responsive horizontal padding
+          vertical: screenHeight * 0.015,  // Responsive vertical padding
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(icon, size: 28, color: Colors.white),
-            ),
-            const SizedBox(height: 20),
+            SizedBox(height: screenHeight * 0.01), // Reduced top spacing
             Text(
-              title,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
+              'Welcome to',
               style: TextStyle(
-                fontSize: 16,
-                color: Colors.white.withOpacity(0.8),
-                height: 1.4,
+                fontSize: screenWidth * 0.045, // Responsive font size
+                color: Colors.white70,
+                fontWeight: FontWeight.w400,
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Build the grid of quick action cards
-  Widget _buildActionGrid() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildQuickActionCard(
-            icon: Icons.location_on_outlined,
-            title: 'Find Places',
-            onTap: () => _showFeatureSnackBar('Find Places'),
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: _buildQuickActionCard(
-            icon: Icons.directions_outlined,
-            title: 'Directions',
-            onTap: () => _showFeatureSnackBar('Directions'),
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// Build individual quick action card
-  Widget _buildQuickActionCard({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: HomeScreen.cardSurface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: HomeScreen.border),
-        ),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: HomeScreen.accent.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, size: 24, color: HomeScreen.accent),
-            ),
-            const SizedBox(height: 12),
             Text(
-              title,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-                color: HomeScreen.textPrimary,
+              'CHARUSAT',
+              style: TextStyle(
+                fontSize: screenWidth * 0.09, // Smaller responsive font size
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.2,
+                height: 1.1,
               ),
-              textAlign: TextAlign.center,
             ),
+            Text(
+              'Campus Navigator',
+              style: TextStyle(
+                fontSize: screenWidth * 0.04, // Smaller font size
+                color: Colors.white70,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            SizedBox(height: screenHeight * 0.02), // Reduced bottom spacing
           ],
         ),
       ),
     );
   }
 
-  /// Build the services list
-  Widget _buildServicesList() {
-    final services = _getServices();
-
-    return Column(
-      children: services.map((service) {
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          child: _buildServiceCard(
-            icon: service['icon'] as IconData,
-            title: service['title'] as String,
-            subtitle: service['subtitle'] as String,
-            onTap: service['onTap'] as VoidCallback,
+  Widget _buildSliverContent(double screenHeight, double screenWidth) {
+    return SliverToBoxAdapter(
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(32),
+            topRight: Radius.circular(32),
           ),
-        );
-      }).toList(),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(screenWidth * 0.05), // Responsive padding
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 8),
+              _buildExploreSection(screenHeight, screenWidth),
+              SizedBox(height: screenHeight * 0.03), // Responsive spacing
+              _buildFeaturesGrid(screenHeight, screenWidth),
+              SizedBox(height: screenHeight * 0.03),
+              _buildServicesTitle(screenWidth),
+              SizedBox(height: screenHeight * 0.02),
+              ..._buildServiceCards(screenWidth),
+              SizedBox(height: screenHeight * 0.04), // Added more bottom spacing
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  /// Get the list of services configuration
-  List<Map<String, dynamic>> _getServices() {
-    return [
+  Widget _buildExploreSection(double screenHeight, double screenWidth) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(screenWidth * 0.05), // Responsive padding
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1E40AF), Color(0xFF3B82F6)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20), // Slightly smaller radius
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(screenWidth * 0.025), // Responsive padding
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.explore,
+                  color: Colors.white,
+                  size: screenWidth * 0.06, // Responsive icon size
+                ),
+              ),
+              SizedBox(width: screenWidth * 0.03),
+              Expanded(
+                child: Text(
+                  'Explore Campus',
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.055, // Smaller responsive font size
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: screenHeight * 0.015),
+          Text(
+            'Take a virtual 360° tour of our beautiful campus. Discover buildings, facilities, and landmarks.',
+            style: TextStyle(
+              fontSize: screenWidth * 0.035, // Responsive font size
+              color: Colors.white.withOpacity(0.8),
+              height: 1.4,
+            ),
+          ),
+          SizedBox(height: screenHeight * 0.02),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const PanoramaScreen()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: const Color(0xFF1E40AF),
+                padding: EdgeInsets.symmetric(vertical: screenHeight * 0.018), // Responsive padding
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                'Start Virtual Tour',
+                style: TextStyle(
+                  fontSize: screenWidth * 0.04, // Responsive font size
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeaturesGrid(double screenHeight, double screenWidth) {
+    final features = [
       {
-        'icon': Icons.camera_alt_outlined,
-        'title': 'Scanner',
-        'subtitle': 'Scan the QR code to get details',
-        'onTap': () => _showFeatureSnackBar('QR Code Scanner'),
+        'icon': Icons.search_rounded,
+        'title': 'Find Places',
+        'color': const Color(0xFF3B82F6),
+        'onTap': () => _showFeatureSnackBar('Find Places'),
       },
       {
-        'icon': Icons.school_outlined,
-        'title': 'Academic Buildings',
-        'subtitle': 'Classrooms, labs, and departments',
+        'icon': Icons.navigation_rounded,
+        'title': 'Directions',
+        'color': const Color(0xFF1D4ED8),
+        'onTap': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CampusMap()),
+          );
+        },
+      },
+      {
+        'icon': Icons.school_rounded,
+        'title': 'Academic',
+        'color': const Color(0xFF2563EB),
         'onTap': () => _navigateToAcademicBuildings(),
       },
       {
-        'icon': Icons.restaurant_outlined,
-        'title': 'Cafeterias',
-        'subtitle': 'Food courts and canteens',
-        'onTap': () => _showFeatureSnackBar('Cafeterias & Dining'),
-      },
-      {
-        'icon': Icons.local_parking_outlined,
-        'title': 'Parking Areas',
-        'subtitle': 'Available parking spots and zones',
-        'onTap': () => _showFeatureSnackBar('Parking Areas'),
-      },
-      {
-        'icon': Icons.local_library_outlined,
-        'title': 'Libraries & Study Areas',
-        'subtitle': 'Central library and reading rooms',
-        'onTap': () => _showFeatureSnackBar('Libraries & Study Areas'),
+        'icon': Icons.map_rounded,
+        'title': 'Campus Map',
+        'color': const Color(0xFF1E40AF),
+        'onTap': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CampusMap()),
+          );
+        },
       },
     ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: screenWidth > 600 ? 2.0 : 1.8, // Responsive aspect ratio
+        crossAxisSpacing: screenWidth * 0.03, // Responsive spacing
+        mainAxisSpacing: screenWidth * 0.03,
+      ),
+      itemCount: features.length,
+      itemBuilder: (context, index) {
+        final feature = features[index];
+        return _buildFeatureCard(
+          icon: feature['icon'] as IconData,
+          title: feature['title'] as String,
+          color: feature['color'] as Color,
+          onTap: feature['onTap'] as VoidCallback,
+          screenWidth: screenWidth,
+          screenHeight: screenHeight,
+        );
+      },
+    );
   }
 
-  /// Build individual service card
+  Widget _buildFeatureCard({
+    required IconData icon,
+    required String title,
+    required Color color,
+    required VoidCallback onTap,
+    required double screenWidth,
+    required double screenHeight,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(screenWidth * 0.035), // Responsive padding
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey[200]!),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: EdgeInsets.all(screenWidth * 0.025), // Responsive padding
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: screenWidth * 0.055, // Responsive icon size
+              ),
+            ),
+            SizedBox(height: screenHeight * 0.008),
+            Flexible(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.032, // Responsive font size
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[800],
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildServicesTitle(double screenWidth) {
+    return Text(
+      'Campus Services',
+      style: TextStyle(
+        fontSize: screenWidth * 0.055, // Responsive font size
+        fontWeight: FontWeight.w700,
+        color: Colors.grey[800],
+      ),
+    );
+  }
+
+  List<Widget> _buildServiceCards(double screenWidth) {
+    return _getServices().map((service) {
+      return Container(
+        margin: EdgeInsets.only(bottom: screenWidth * 0.03), // Responsive margin
+        child: _buildServiceCard(
+          icon: service['icon'] as IconData,
+          title: service['title'] as String,
+          subtitle: service['subtitle'] as String,
+          color: service['color'] as Color,
+          onTap: service['onTap'] as VoidCallback,
+          screenWidth: screenWidth,
+        ),
+      );
+    }).toList();
+  }
+
   Widget _buildServiceCard({
     required IconData icon,
     required String title,
     required String subtitle,
+    required Color color,
     required VoidCallback onTap,
+    required double screenWidth,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(screenWidth * 0.045), // Responsive padding
         decoration: BoxDecoration(
-          color: HomeScreen.cardSurface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: HomeScreen.border),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.grey[200]!),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              width: screenWidth * 0.13, // Responsive width
+              height: screenWidth * 0.13, // Responsive height
               decoration: BoxDecoration(
-                color: HomeScreen.surface,
-                borderRadius: BorderRadius.circular(10),
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, size: 22, color: HomeScreen.textPrimary),
+              child: Icon(
+                icon,
+                color: color,
+                size: screenWidth * 0.065, // Responsive icon size
+              ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: screenWidth * 0.04),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: HomeScreen.textPrimary,
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.042, // Responsive font size
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: screenWidth * 0.01),
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 14,
-                      color: HomeScreen.textSecondary,
+                      fontSize: screenWidth * 0.035, // Responsive font size
+                      color: Colors.grey[600],
                       height: 1.3,
                     ),
                   ),
                 ],
               ),
             ),
-            Icon(
-              Icons.chevron_right,
-              size: 20,
-              color: HomeScreen.textSecondary,
+            Container(
+              padding: EdgeInsets.all(screenWidth * 0.02),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                Icons.arrow_forward_ios,
+                size: screenWidth * 0.035, // Responsive icon size
+                color: Colors.grey[600],
+              ),
             ),
           ],
         ),
@@ -362,7 +433,39 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Navigate to Academic Buildings screen
+  List<Map<String, dynamic>> _getServices() {
+    return [
+      {
+        'icon': Icons.school,
+        'title': 'Academic Buildings',
+        'subtitle': 'Classrooms, labs, and departments',
+        'color': const Color(0xFF3B82F6),
+        'onTap': () => _navigateToAcademicBuildings(),
+      },
+      {
+        'icon': Icons.restaurant,
+        'title': 'Cafeterias & Dining',
+        'subtitle': 'Food courts and canteens',
+        'color': const Color(0xFF1D4ED8),
+        'onTap': () => _showFeatureSnackBar('Cafeterias & Dining'),
+      },
+      {
+        'icon': Icons.local_parking,
+        'title': 'Parking Areas',
+        'subtitle': 'Available parking spots and zones',
+        'color': const Color(0xFF2563EB),
+        'onTap': () => _showFeatureSnackBar('Parking Areas'),
+      },
+      {
+        'icon': Icons.local_library,
+        'title': 'Libraries & Study Areas',
+        'subtitle': 'Central library and reading rooms',
+        'color': const Color(0xFF1E40AF),
+        'onTap': () => _showFeatureSnackBar('Libraries & Study Areas'),
+      },
+    ];
+  }
+
   void _navigateToAcademicBuildings() {
     Navigator.push(
       context,
@@ -370,97 +473,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Handle feature actions with appropriate behavior
   void _showFeatureSnackBar(String feature) {
-    if (feature == "QR Code Scanner") {
-      _handleQRScannerAction();
-    } else {
-      _showComingSoonMessage(feature);
-    }
-  }
-
-  /// Handle QR Scanner action based on platform support
-  void _handleQRScannerAction() {
-    if (_isPlatformSupported()) {
-      _requestCameraPermissionAndNavigate();
-    } else {
-      _showUnsupportedPlatformMessage();
-    }
-  }
-
-  /// Check if current platform supports QR scanning
-  bool _isPlatformSupported() {
-    return !kIsWeb &&
-        !Platform.isWindows &&
-        !Platform.isLinux &&
-        !Platform.isMacOS;
-  }
-
-  /// Request camera permission and navigate to QR scanner
-  void _requestCameraPermissionAndNavigate() async {
-    final status = await Permission.camera.request();
-    if (status.isDenied) {
-      _showCameraPermissionError();
-    } else {
-      _navigateToQRScanner();
-    }
-  }
-
-  /// Navigate to QR scanner screen
-  void _navigateToQRScanner() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const QRScannerScreen()),
-    );
-  }
-
-  /// Show coming soon message for features
-  void _showComingSoonMessage(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           '$feature coming soon!',
           style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
         ),
-        backgroundColor: HomeScreen.primary,
+        backgroundColor: const Color(0xFF1E40AF),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),
         duration: const Duration(seconds: 2),
-      ),
-    );
-  }
-
-  /// Show unsupported platform message
-  void _showUnsupportedPlatformMessage() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text(
-          'QR scanning is not available on this platform',
-          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-        ),
-        backgroundColor: Colors.red.shade700,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 3),
-      ),
-    );
-  }
-
-  /// Show camera permission error
-  void _showCameraPermissionError() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text(
-          'Camera permission is required for QR scanning',
-          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-        ),
-        backgroundColor: Colors.red.shade700,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 3),
       ),
     );
   }

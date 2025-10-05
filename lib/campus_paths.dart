@@ -246,7 +246,8 @@ class CampusData {
         // Road from DEPSTAR to Girls Hostel
         LatLng(22.6008, 72.8205), //  Start: DEPSTAR (A5)
         LatLng(22.600382, 72.819639), // Exit DEPSTAR road
-        LatLng(22.600765, 72.819380),LatLng(22.600898, 72.819353),
+        LatLng(22.600765, 72.819380),
+        LatLng(22.600898, 72.819353),
         LatLng(22.600990 ,72.819460),
         LatLng(22.601680, 72.819000),
         LatLng(22.6015, 72.8187), // End: Girls Hostel
@@ -278,24 +279,105 @@ class CampusData {
         LatLng(22.603400, 72.818880),
         LatLng(22.603258, 72.818346), //End: CMPICA
       ],
+      'Admin Building (A1)':[
+        LatLng(22.6008, 72.8205), //  Start: DEPSTAR (A5)
+        LatLng(22.600502, 72.819955),
+        LatLng(22.600124  , 72.82022),
+        LatLng(22.600081, 72.820117),
+        LatLng(22.5999, 72.8202), // End: Admin Building (A1)
+      ],
+      'IIIM (A2)':[
+        LatLng(22.6008, 72.8205), //  Start: DEPSTAR (A5)
+        LatLng(22.600502, 72.819955),
+        LatLng(22.600124  , 72.82022),
+        LatLng(22.600098, 72.820368),
+        LatLng(22.599966, 72.820434),
+        LatLng(22.6002, 72.8209), // End: IIIM (A2)
+      ],
+      'Cricket Ground':[
+        LatLng(22.6008, 72.8205), //  Start: DEPSTAR (A5)
+        LatLng(22.600502, 72.819955),
+        LatLng(22.600124, 72.82022),
+        LatLng(22.600098, 72.820368),
+        LatLng(22.599516, 72.820733),
+        LatLng(22.599197 , 72.820666),
+        LatLng(22.598867, 72.820874),
+        LatLng(22.5993, 72.8217), // End: Cricket ground
+      ],
+      'RPCP (A3)':[
+        LatLng(22.6008, 72.8205), //  Start: DEPSTAR (A5)
+        LatLng(22.600502, 72.819955),
+        LatLng(22.600124  , 72.82022),
+        LatLng(22.599990 , 72.819929),
+        LatLng(22.599820, 72.819890), // Turn
+        LatLng(22.599580, 72.820050), // Straight Road
+        LatLng(22.5993, 72.8195), // End: RPCP
+      ],
+      'Lake & Lake Canteen': [
+        LatLng(22.6008, 72.8205), //  Start: DEPSTAR (A5)
+        LatLng(22.600502, 72.819955),
+        LatLng(22.600124  , 72.82022),
+        LatLng(22.599990 , 72.819929),
+        LatLng(22.599831, 72.819900),
+        LatLng(22.599247, 72.820256),
+        LatLng(22.599156, 72.820594),
+        LatLng(22.598803, 72.820825),
+        LatLng(22.5985, 72.8202), //End: lake
+      ],
     },
 
     'Admin Building (A1)': {
       'IIIM (A2)': [
-        // Central road from Admin to IIIM
         LatLng(22.5999, 72.8202), // Start: Admin Building (A1)
-        LatLng(22.6000, 72.8205), // Central campus road
-        LatLng(22.6001, 72.8207), // Continue east
+        LatLng(22.600081, 72.820117),
+        LatLng(22.600124  , 72.82022),
+        LatLng(22.600098, 72.820368),
+        LatLng(22.599966, 72.820434),
         LatLng(22.6002, 72.8209), // End: IIIM (A2)
       ],
       'Cricket Ground': [
         // Road from Admin to Cricket Ground
         LatLng(22.5999, 72.8202), // Start: Admin Building (A1)
-        LatLng(22.5997, 72.8205), // Turn south
-        LatLng(22.5995, 72.8210), // Continue towards ground
-        LatLng(22.5994, 72.8215), // Approach ground
-        LatLng(22.5993, 72.8217), // End: Cricket Ground
+        LatLng(22.600081, 72.820117),
+        LatLng(22.600124, 72.82022),
+        LatLng(22.600098, 72.820368),
+        LatLng(22.599516, 72.820733),
+        LatLng(22.599197 , 72.820666),
+        LatLng(22.598867, 72.820874),
+        LatLng(22.5993, 72.8217), // End: Cricket ground
       ],
+      'RPCP (A3)':[
+        LatLng(22.5999, 72.8202), // Start: Admin Building (A1)
+        LatLng(22.600081, 72.820117),
+        LatLng(22.599990 , 72.819929),
+        LatLng(22.599820, 72.819890), // Turn
+        LatLng(22.599580, 72.820050), // Straight Road
+        LatLng(22.5993, 72.8195), // End: RPCP
+      ],
+      'Lake & Lake Canteen':[
+        LatLng(22.5999, 72.8202), // Start: Admin Building (A1)
+        LatLng(22.600081, 72.820117),
+        LatLng(22.599990 , 72.819929),
+        LatLng(22.599831, 72.819900),
+        LatLng(22.599247, 72.820256),
+        LatLng(22.599156, 72.820594),
+        LatLng(22.598803, 72.820825),
+        LatLng(22.5985, 72.8202), //End: lake
+      ],
+      'Girls Hostel':[
+        LatLng(22.5999, 72.8202), // Start: Admin Building (A1)
+        LatLng(22.600081, 72.820117),
+        LatLng(22.599975 , 72.819910),
+        LatLng(22.600660, 72.819510),
+        LatLng(22.600723, 72.819415),
+        LatLng(22.600791, 72.819378),
+        LatLng(22.600199, 72.818348),
+        LatLng(22.601024, 72.817872),
+        LatLng(22.6015, 72.8187), // End: Girls Hostel
+      ],
+      'PDPIAS':[
+
+      ]
     },
     'IIIM (A2)': {
       'Cricket Ground': [
